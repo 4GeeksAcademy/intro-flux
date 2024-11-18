@@ -1,42 +1,76 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			//aqui van variables que estaran disponibles para TODA la aplicacion
+			posts:[],
+			singlePost: {}
 		},
 		actions: {
+			//aqui van funciones que modifican las variables del store
 			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+			 getPosts: async () => {
+				try {
+					const resp = await fetch('https://jsonplaceholder.typicode.com/posts');
+					if (!resp.ok) throw new Error('error fetching posts')
+					const data = await resp.json()
+					setStore({posts: data})
+				} catch (error) {
+					console.error(error)
+				}
 			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
+			createPost: async (payload) => {
+				try {
+					const resp = await fetch('https://jsonplaceholder.typicode.com/posts', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(payload)
+					});
+					if (!resp.ok) throw new Error('error fetching posts')
+					const data = await resp.json()
+					console.log(data)
+				} catch (error) {
+					console.error(error)
+				}
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
+			getSinglePost: async (id) => {
+				try {
+					const resp = await fetch('https://jsonplaceholder.typicode.com/posts/'+id);
+					if (!resp.ok) throw new Error('error fetching posts')
+					const data = await resp.json()
+					setStore({singlePost: data})
+				} catch (error) {
+					console.error(error)
+				}
+			},
+			deletePost: async (id) => {
+				try {
+					const resp = await fetch('https://jsonplaceholder.typicode.com/posts/'+id, {
+						method: 'DELETE'
+					});
+					if (!resp.ok) throw new Error('error fetching posts')
+					const data = await resp.json()
+					console.log(data)
+				} catch (error) {
+					console.error(error)
+				}
+			},
+			editPost: async (id, post) => {
+				try {
+					const resp = await fetch('https://jsonplaceholder.typicode.com/posts/'+id, {
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(post)
+					});
+					if (!resp.ok) throw new Error('error fetching posts')
+					const data = await resp.json()
+					console.log(data)
+				} catch (error) {
+					console.error(error)
+				}
 			}
 		}
 	};
